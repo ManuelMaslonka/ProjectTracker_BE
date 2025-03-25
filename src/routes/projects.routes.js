@@ -11,7 +11,7 @@ router.get("/:id", projectsController.getById);
 router.patch("/:id", projectsController.update);
 router.post("/:id/task", projectsController.addTask);
 router.post("/:id/member", projectsController.addMember);
-router.post("/:id/status/:status", projectsController.setStatus)
+router.post("/:id/status/:status", projectsController.setStatus);
 
 
 module.exports = router;

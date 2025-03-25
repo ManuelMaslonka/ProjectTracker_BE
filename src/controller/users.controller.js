@@ -6,7 +6,6 @@ const HttpError = require("../utils/HttpError");
 
 
 const getAll = async (req, res, next) => {
-    console.log("test")
     res.send(await userRepository.getAll());
 };
 

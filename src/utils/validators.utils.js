@@ -27,15 +27,6 @@ const validateProject = [
         .optional()
         .isIn(['active','completed']).withMessage('Status must be either active or completed'),
 
-    body('tags')
-        .optional()
-        .isArray().withMessage('Tags must be an array')
-        .custom(tags => {
-            if (tags && tags.length > 0) {
-                return tags.every(tag => typeof tag === 'string' && tag.trim() !== '');
-            }
-            return true;
-        }).withMessage('Each tag must be a non-empty string'),
 
     body('users')
         .optional()
@@ -60,9 +51,6 @@ const validateTask = [
     body('due_date')
         .notEmpty().withMessage('Must be filled due_date')
         .isISO8601().withMessage('Invalid date format'),
-
-    body("project")
-        .notEmpty().withMessage('Must have project')
 ];
 
 module.exports = validateTask;

@@ -77,6 +77,7 @@ const addMember = [
         try {
             checkValidation(validationResult(req));
             const id = req.params.id;
+
             const exist = await projectsRepository.findById(id);
             if (!exist) {
                 throw new HttpError(404, "Todo not found");
