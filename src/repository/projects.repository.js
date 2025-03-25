@@ -4,6 +4,60 @@ const HttpError = require("../utils/HttpError");
 
 class ProjectsRepository {
 
+    async addTag(id, tag, user) {
+        try {
+            const projectToUpdate = await this.findById(id);
+            if (!projectToUpdate) {
+                throw new HttpError(404, 'Project not found');
+            } else if (projectToUpdate.author.toString() !== user.userId || user.roles.includes("admin") ) {
+                throw new HttpError(403, 'You are not allowed to update this project');
+            }
+
+            const updatedProject = await projectModel.findByIdAndUpdate(
+                id,
+                {
+                    $addToSet: {
+                        tags: tag
+                    }
+                },
+                {
+                    new: true
+                }
+            )
+            return updatedProject;
+        } catch (e) {
+            console.error(e);
+            throw new HttpError(500, e.message);
+        }
+    }
+
+    async removeTag(id, tag, userId) {
+        try {
+            const projectToUpdate = await this.findById(id);
+            if (!projectToUpdate) {
+                throw new HttpError(404, 'Project not found');
+            } else if (projectToUpdate.author.toString() !== userId) {
+                throw new HttpError(403, 'You are not allowed to update this project');
+            }
+
+            const updatedProject = await projectModel.findByIdAndUpdate(
+                id,
+                {
+                    $pull: {
+                        tags: tag
+                    }
+                },
+                {
+                    new: true
+                }
+            )
+            return updatedProject;
+        } catch (e) {
+            console.error(e);
+            throw new HttpError(500, e.message);
+        }
+    }
+
     async update(id, project, userId) {
         try {
             const projectToUpdate = await this.findById(id);

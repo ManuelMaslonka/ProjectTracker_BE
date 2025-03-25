@@ -182,6 +182,51 @@ const setStatus = [
     }
 ]
 
+const addTag = [
+    param("id").notEmpty().withMessage("Id is required"),
+    body("tag").notEmpty().withMessage("Tag is required").isString().withMessage("Tag must be a string"),
+    async (req, res, next) => {
+        try {
+            checkValidation(validationResult(req));
+            const id = req.params.id;
+            const exist = await projectsRepository.findById(id);
+
+            if (!exist) {
+                throw new HttpError(404, "Project not found");
+            }
+
+            await projectsRepository.addTag(id, req.body.tag, req.user);
+            res.send({
+                message: "Tag added successfully"
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+];
+
+const removeTag = [
+    param("id").notEmpty().withMessage("Id is required"),
+    body("tag").notEmpty().withMessage("Tag is required").isString().withMessage("Tag must be a string"),
+    async (req, res, next) => {
+        try {
+            checkValidation(validationResult(req));
+            const id = req.params.id;
+            const exist = await projectsRepository.findById(id);
+
+            if (!exist) {
+                throw new HttpError(404, "Project not found");
+            }
+
+            await projectsRepository.removeTag(id, req.body.tag, req.user.userId);
+            res.send({
+                message: "Tag removed successfully"
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+];
 
 module.exports = {
     get,
@@ -192,5 +237,7 @@ module.exports = {
     remove,
     addTask,
     addMember,
-    setStatus
+    setStatus,
+    addTag,
+    removeTag
 }

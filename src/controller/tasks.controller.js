@@ -8,10 +8,10 @@ const validateTask = require("../utils/validators.utils");
 const {all} = require("express/lib/application");
 
 const create = [
+    body("project").notEmpty().withMessage("Project is required"),
     ...validateTask,
     async (req, res, next) => {
         try {
-            console.log(req.body);
             checkValidation(validationResult(req));
 
             const newTask = await tasksRepository.create(req.body, req.user);
