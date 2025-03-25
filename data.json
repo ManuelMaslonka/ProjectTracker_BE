@@ -1,0 +1,44 @@
+{
+  "todos": [
+    {
+      "id": 1,
+      "title": "Buy groceries",
+      "description": "Purchase milk, eggs, and bread from the supermarket.",
+      "completed": false,
+      "priority": "High",
+      "due_date": "2025-03-10"
+    },
+    {
+      "id": 2,
+      "title": "Finish project report",
+      "description": "Complete and submit the monthly project report to the manager.",
+      "completed": false,
+      "priority": "Medium",
+      "due_date": "2025-03-05"
+    },
+    {
+      "id": 3,
+      "title": "Call the plumber",
+      "description": "Schedule a visit to fix the leaking kitchen sink.",
+      "completed": true,
+      "priority": "Low",
+      "due_date": "2025-03-01"
+    },
+    {
+      "id": 4,
+      "title": "Workout session",
+      "description": "Attend the 1-hour workout session at the gym.",
+      "completed": false,
+      "priority": "Medium",
+      "due_date": "2025-03-04"
+    },
+    {
+      "id": 5,
+      "title": "Book flight tickets",
+      "description": "Book flight tickets for the upcoming vacation in June.",
+      "completed": false,
+      "priority": "High",
+      "due_date": "2025-03-15"
+    }
+  ]
+}
