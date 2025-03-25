@@ -14,6 +14,10 @@ class UserRepository {
         return userModel.User.findOne({email: email});
     }
 
+    async getById(id) {
+        return userModel.User.findById(id);
+    }
+
     async create(attr) {
         try {
             const salt = crypto.randomBytes(16).toString("hex");

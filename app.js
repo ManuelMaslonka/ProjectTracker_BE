@@ -32,10 +32,10 @@ if (!process.env.API_KEY) {
 app.use(json())
 app.use(authMiddleware);
 
+app.use("/users", require("./src/routes/users.routes"))
 app.use("/projects", require("./src/routes/projects.routes"))
 app.use("/public", require("./src/routes/public.routes"))
 app.use("/tasks", require("./src/routes/tasks.routes"))
-app.use("/users", require("./src/routes/users.routes"))
 
 app.use((err, req, res, next) => {
     res.status(err.status || 500);

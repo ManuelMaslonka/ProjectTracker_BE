@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const HttpError = require("../utils/HttpError");
 
 
 const authMiddleware = async (req, res, next) => {
