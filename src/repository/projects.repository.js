@@ -110,11 +110,13 @@ class ProjectsRepository {
 
     async create(attr) {
         try {
+            console.log(attr)
             const project = new projectModel({
                 title: attr.title,
                 description: attr.description,
                 due_date: attr.due_date,
-
+                status: "active",
+                tags: [...attr.tags],
                 author: attr.author,
             });
             await project.save();

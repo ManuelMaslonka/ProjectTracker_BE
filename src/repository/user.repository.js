@@ -1,3 +1,4 @@
+
 const crypto = require("crypto");
 const userModel = require('../model/user.model');
 const addressModel = require('../model/user.model');
@@ -17,6 +18,7 @@ class UserRepository {
     async getById(id) {
         return userModel.User.findById(id);
     }
+
 
     async create(attr) {
         try {

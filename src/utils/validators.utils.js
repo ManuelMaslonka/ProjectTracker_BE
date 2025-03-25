@@ -27,6 +27,9 @@ const validateProject = [
         .optional()
         .isIn(['active','completed']).withMessage('Status must be either active or completed'),
 
+    body('tags')
+        .optional()
+        .isArray().withMessage('Tags must be an array'),
 
     body('users')
         .optional()

@@ -1,5 +1,6 @@
 const HttpError = require("../utils/HttpError")
 const projectsRepository = require("../repository/projects.repository")
+const userRepository = require("../repository/user.repository")
 const {body, validationResult, matchedData, param} = require("express-validator");
 const {checkValidation} = require("../utils/helpers");
 const validateProject = require("../utils/validators.utils");
