@@ -104,7 +104,7 @@ const getById = [
         try {
             checkValidation(validationResult(req));
             res.send(
-                await projectsRepository.findById(req.params.id)
+                await projectsRepository.findByIdWithTasksAndAuthorAndAsssinged(req.params.id)
             )
         } catch (e) {
             next(e)

@@ -9,7 +9,7 @@ class ProjectsRepository {
             const projectToUpdate = await this.findById(id);
             if (!projectToUpdate) {
                 throw new HttpError(404, 'Project not found');
-            } else if (projectToUpdate.author.toString() !== user.userId || user.roles.includes("admin") ) {
+            } else if (projectToUpdate.author.toString() !== user.userId || user.roles.includes("admin")) {
                 throw new HttpError(403, 'You are not allowed to update this project');
             }
 
@@ -118,6 +118,7 @@ class ProjectsRepository {
                 status: "active",
                 tags: [...attr.tags],
                 author: attr.author,
+                users: [attr.author]
             });
             await project.save();
         } catch (e) {
@@ -153,6 +154,16 @@ class ProjectsRepository {
         return projectModel.findById(id);
     }
 
+    async findByIdWithTasksAndAuthorAndAsssinged(id) {
+        return projectModel.findById(id)
+            .populate({
+                path: "tasks",
+                populate: [{path: "assigned_to"}, {path: "author", select: "name email _id"}]
+            })
+            .populate("author", "name email _id")
+            .populate("users", "name email _id");
+    }
+
     async addTask(id, task, userId, project) {
         try {
 
@@ -163,7 +174,7 @@ class ProjectsRepository {
                 due_date: task.due_date,
                 state: "open",
                 project: project._id,
-                author: userId
+                author: userId,
             })
 
             await newTask.save();

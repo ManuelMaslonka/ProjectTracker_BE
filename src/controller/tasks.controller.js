@@ -111,6 +111,34 @@ const setState = [
     }
 ]
 
+const logHours = [
+    param("id").notEmpty().withMessage("Id is required"),
+    body("hours").notEmpty().withMessage("Hours are required").isNumeric().withMessage("Hours must be a number"),
+    async (req, res, next) => {
+        try {
+            checkValidation(validationResult(req));
+
+            const task = await tasksRepository.findById(req.params.id);
+            if (!task) {
+                throw new HttpError(404, "Task not found");
+            }
+
+            // Check if the user making the request is the assigned user
+            if (!task.assigned_to || task.assigned_to.toString() !== req.user.userId) {
+                throw new HttpError(403, "Only the assigned user can log hours");
+            }
+
+            await tasksRepository.logHours(req.params.id, req.body.hours);
+
+            res.send({
+                message: "Hours logged successfully"
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+]
+
 module.exports = {
     create,
     findAll,
@@ -118,5 +146,6 @@ module.exports = {
     update,
     findById,
     assignTask,
-    setState
+    setState,
+    logHours
 }

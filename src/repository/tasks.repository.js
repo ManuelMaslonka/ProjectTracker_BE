@@ -106,6 +106,28 @@ class TasksRepository {
         }
     }
 
+    async logHours(id, hours) {
+        try {
+            const task = await taskModel.findById(id);
+            if (!task) {
+                throw new HttpError(404, "Task not found");
+            }
+
+            await taskModel.findByIdAndUpdate(
+                id,
+                {
+                    logged_hours: hours
+                },
+                {
+                    new: true
+                }
+            );
+        } catch (e) {
+            console.error(e);
+            throw new HttpError(e);
+        }
+    }
+
 }
 
 

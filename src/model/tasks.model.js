@@ -38,6 +38,7 @@ const TaskSchema = new Schema({
     project: {type: Schema.Types.ObjectId, ref: "Projects", required: true},
     author: {type: Schema.Types.ObjectId, ref: "User", required: true},
     assigned_to: {type: Schema.Types.ObjectId, ref: "User"},
+    logged_hours: {type: Number, default: 0},
 });
 
 module.exports = model("Task", TaskSchema);

@@ -10,6 +10,7 @@ router.get("/:id", tasksController.findById);
 router.post("/:id/assign", tasksController.assignTask);
 router.patch("/:id", tasksController.update);
 router.post("/:id/state/:state", tasksController.setState);
+router.post("/:id/log-hours", tasksController.logHours);
 
 
 module.exports = router;
