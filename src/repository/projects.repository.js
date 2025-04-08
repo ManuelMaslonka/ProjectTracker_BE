@@ -170,7 +170,6 @@ class ProjectsRepository {
 
     async addTask(id, task, userId, project) {
         try {
-
             const newTask = new taskModel({
                 title: task.title,
                 description: task.description,
@@ -231,6 +230,19 @@ class ProjectsRepository {
         } catch (e) {
             console.error(e)
             throw new HttpError(e);
+        }
+    }
+
+    async removeTask(id, taskId) {
+        try {
+            return await projectModel.findByIdAndUpdate(
+                id,
+                {$pull: {tasks: taskId}},
+                {new: true}
+            );
+        } catch (e) {
+            console.error(e);
+            throw new HttpError(500, e.message);
         }
     }
 }

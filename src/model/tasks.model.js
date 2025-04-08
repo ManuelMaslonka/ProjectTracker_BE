@@ -41,4 +41,7 @@ const TaskSchema = new Schema({
     logged_hours: {type: Number, default: 0},
 });
 
+
+
+
 module.exports = model("Task", TaskSchema);

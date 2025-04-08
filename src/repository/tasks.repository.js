@@ -1,6 +1,7 @@
 const taskModel = require('../model/tasks.model');
 const {Schema} = require("mongoose");
 const HttpError = require("../utils/HttpError");
+const projectRepository = require('../repository/projects.repository');
 
 class TasksRepository {
 
@@ -128,6 +129,32 @@ class TasksRepository {
         }
     }
 
+    async deleteById(id) {
+        try {
+            const task = await taskModel.findById(id);
+            if (!task) {
+                throw new HttpError(404, "Task not found");
+            }
+
+            // Get the project ID from the task
+            const projectId = task.project;
+
+            // Import projects repository
+
+
+            // Remove the task reference from the project's tasks array
+            await projectRepository.removeTask(
+                projectId,
+                id
+            );
+
+            // Delete the task
+            await taskModel.findByIdAndDelete(id);
+        } catch (e) {
+            console.error(e);
+            throw new HttpError(500, "Error deleting task");
+        }
+    }
 }
 
 

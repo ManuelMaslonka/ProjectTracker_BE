@@ -9,7 +9,7 @@ const authMiddleware = async (req, res, next) => {
             return next();
         }
 
-        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2UyZGIxZmM4OWI4MmEyZWVmZGRjNDIiLCJ1c2VyTmFtZSI6ImpvaG5AZXhhbXBsZS5jb20iLCJyb2xlcyI6WyJhZG1pbiJdLCJpYXQiOjE3NDQwNDUxMjd9.P93BnxuvkZR8boDQH-X8DjMLkBx1bevuAy7XY5DvW2o"//req.headers.authorization;
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2UyYWYyYWRhNTBmOTFmZTZkMDk3ZWUiLCJ1c2VyTmFtZSI6IjEyM0AxMjMyNC5jb20iLCJyb2xlcyI6WyJhZG1pbiJdLCJpYXQiOjE3NDQxMTQ0NTF9.Z4TTJgF8kVfOGP8LV22dOcRaNiS2CMEab99eaFpZFd0"//req.headers.authorization;
         if (!token) {
             throw new HttpError(401, "Unauthorized");
         }

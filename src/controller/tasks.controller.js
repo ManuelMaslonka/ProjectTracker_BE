@@ -1,3 +1,4 @@
+
 const {body, validationResult, matchedData, param} = require("express-validator");
 const {checkValidation} = require("../utils/helpers");
 const tasksRepository = require("../repository/tasks.repository");
@@ -88,9 +89,11 @@ const assignTask = [
 
 const setState = [
     param("id").notEmpty().withMessage("Id is required"),
-    param("state").notEmpty().withMessage("State is required").isIn(["open" ,"progress" , "completed"]).withMessage("is only in active or completed"),
+    param("state").notEmpty().withMessage("State is required").isIn(["open", "progress", "completed"]).withMessage("is only in active or completed"),
     async (req, res, next) => {
         try {
+
+            console.log()
 
             checkValidation(validationResult(req))
 
@@ -107,6 +110,28 @@ const setState = [
 
         } catch (e) {
             next(e)
+        }
+    }
+]
+
+const deleteTask = [
+    param("id").notEmpty().withMessage("Id is required"),
+    async (req, res, next) => {
+        try {
+            checkValidation(validationResult(req));
+
+            const exist = await tasksRepository.findById(req.params.id);
+            if (!exist) {
+                throw new HttpError(404, "Task not found");
+            }
+
+            await tasksRepository.deleteById(req.params.id);
+
+            res.send({
+                message: "Task deleted successfully"
+            });
+        } catch (e) {
+            next(e);
         }
     }
 ]
@@ -137,6 +162,8 @@ const logHours = [
             next(e);
         }
     }
+
+
 ]
 
 module.exports = {
@@ -147,5 +174,6 @@ module.exports = {
     findById,
     assignTask,
     setState,
-    logHours
+    logHours,
+    deleteTask
 }
