@@ -28,14 +28,22 @@ if (!process.env.API_KEY) {
     process.exit(1);
 }
 
-
 app.use(json())
 app.use(authMiddleware);
+
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    next();
+})
 
 app.use("/users", require("./src/routes/users.routes"))
 app.use("/projects", require("./src/routes/projects.routes"))
 app.use("/public", require("./src/routes/public.routes"))
 app.use("/tasks", require("./src/routes/tasks.routes"))
+app.use("/tags", require("./src/routes/tags.routes"))
 
 app.use((err, req, res, next) => {
     res.status(err.status || 500);

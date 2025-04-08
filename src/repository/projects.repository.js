@@ -130,8 +130,12 @@ class ProjectsRepository {
         return projectModel.find().populate("tasks");
     }
 
+    async getAllTags() {
+        return projectModel.find().distinct("tags");
+    }
+
     async getForUser(userId) {
-        return projectModel.find().where().or([{author: userId}, {users: userId}]);
+        return projectModel.find().where().or([{author: userId}, {users: userId}]).populate("author", "name email _id");
     }
 
     async getAllTaskForUser(userId) {
