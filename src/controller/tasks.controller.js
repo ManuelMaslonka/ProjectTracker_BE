@@ -1,12 +1,9 @@
-
 const {body, validationResult, matchedData, param} = require("express-validator");
 const {checkValidation} = require("../utils/helpers");
 const tasksRepository = require("../repository/tasks.repository");
 const projectRepository = require("../repository/projects.repository");
-const jwt = require("jsonwebtoken");
 const HttpError = require("../utils/HttpError");
 const validateTask = require("../utils/validators.utils");
-const {all} = require("express/lib/application");
 
 const create = [
     body("project").notEmpty().withMessage("Project is required"),
@@ -72,6 +69,8 @@ const assignTask = [
     async (req, res, next) => {
         try {
             checkValidation(validationResult(req));
+
+            console.log("assign task", req.body.assignedTo)
 
             exist = await tasksRepository.findById(req.params.id);
             if (!exist) {

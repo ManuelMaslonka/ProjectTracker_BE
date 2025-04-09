@@ -1,8 +1,8 @@
-
 const crypto = require("crypto");
 const userModel = require('../model/user.model');
-const addressModel = require('../model/user.model');
 const HttpError = require("../utils/HttpError");
+const projectModel = require("../model/projects.model");
+const taskModel = require("../model/tasks.model");
 
 
 class UserRepository {
@@ -37,6 +37,29 @@ class UserRepository {
         } catch (e) {
             throw new HttpError(400, e);
         }
+    }
+
+    async getAvailableUsersToAdd(projectId) {
+        const usersInProject = await projectModel.findById(projectId).populate('users');
+        return userModel.User.find().then(users => {
+            const usersInProjectIds = usersInProject.users.map(user => user._id.toString());
+            usersInProjectIds.push(usersInProject.author.toString());
+            const availableUsers = users.filter(user => !usersInProjectIds.includes(user._id.toString()));
+            return {users: availableUsers};
+        });
+    }
+
+    async getAvailableUsersToAssignTask(projectId, taskId) {
+        const allUsersInProject = await projectModel.findById(projectId)
+            .populate('users', 'name email _id')
+            .populate('author', 'name email _id');
+
+        const userInTask = await taskModel.findById(taskId);
+        console.log(userInTask);
+        const users = [...allUsersInProject.users, allUsersInProject.author];
+        const filteredUsers = users.filter(user => user._id.toString() !== userInTask.assigned_to.toString());
+        console.log(filteredUsers);
+        return filteredUsers;
     }
 
     checkPassword = (user, password) => {

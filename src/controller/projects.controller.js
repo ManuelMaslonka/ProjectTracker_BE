@@ -1,6 +1,5 @@
 const HttpError = require("../utils/HttpError")
 const projectsRepository = require("../repository/projects.repository")
-const userRepository = require("../repository/user.repository")
 const {body, validationResult, matchedData, param} = require("express-validator");
 const {checkValidation} = require("../utils/helpers");
 const validateProject = require("../utils/validators.utils");
@@ -50,9 +49,6 @@ const update = [
     async (req, res, next) => {
         try {
             checkValidation(validationResult(req))
-            const matched = matchedData(req, {
-                onlyValidData: true
-            });
 
             const id = req.params.id;
             const exist = await projectsRepository.findById(id);
@@ -62,6 +58,8 @@ const update = [
 
             const newTodo = req.body;
             const userId = req.user.userId;
+
+
             await projectsRepository.update(id, newTodo, userId);
             res.send({
                 message: "Its updated successfully"
@@ -103,8 +101,9 @@ const getById = [
     async (req, res, next) => {
         try {
             checkValidation(validationResult(req));
+            let project = await projectsRepository.findByIdWithTasksAndAuthorAndAsssinged(req.params.id);
             res.send(
-                await projectsRepository.findByIdWithTasksAndAuthorAndAsssinged(req.params.id)
+                project
             )
         } catch (e) {
             next(e)
@@ -219,7 +218,8 @@ const removeTag = [
                 throw new HttpError(404, "Project not found");
             }
 
-            await projectsRepository.removeTag(id, req.body.tag, req.user.userId);
+
+            await projectsRepository.removeTag(id, req.body.tag, req.user);
             res.send({
                 message: "Tag removed successfully"
             });
@@ -228,6 +228,51 @@ const removeTag = [
         }
     }
 ];
+
+const removeMember = [
+    param("id").notEmpty().withMessage("Id is required"),
+    body("userId").notEmpty().withMessage("User is required").isString().withMessage("User must be a string"),
+    async (req, res, next) => {
+        try {
+            checkValidation(validationResult(req));
+            const id = req.params.id;
+            const exist = await projectsRepository.findById(id);
+
+            if (!exist) {
+                throw new HttpError(404, "Project not found");
+            }
+
+            await projectsRepository.removeMember(id, req.body.userId, req.user.userId);
+            res.send({
+                message: "Member removed successfully"
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+]
+
+
+const getMembers = [
+    param("id").notEmpty().withMessage("Id is required"),
+    async (req, res, next) => {
+        try {
+            checkValidation(validationResult(req));
+            const id = req.params.id;
+            const exist = await projectsRepository.findById(id);
+
+            if (!exist) {
+                throw new HttpError(404, "Project not found");
+            }
+
+            const members = await projectsRepository.getAllMembers(id);
+            res.send(members);
+        } catch (error) {
+            next(error);
+        }
+    }
+]
 
 module.exports = {
     get,
@@ -240,5 +285,7 @@ module.exports = {
     addMember,
     setStatus,
     addTag,
-    removeTag
+    removeTag,
+    removeMember,
+    getMembers
 }

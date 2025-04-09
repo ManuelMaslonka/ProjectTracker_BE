@@ -1,5 +1,4 @@
 const taskModel = require('../model/tasks.model');
-const {Schema} = require("mongoose");
 const HttpError = require("../utils/HttpError");
 const projectRepository = require('../repository/projects.repository');
 
@@ -10,7 +9,7 @@ class TasksRepository {
     }
 
     async findById(id) {
-        return taskModel.findById(id);
+        return taskModel.findById(id).populate("assigned_to", "name email").populate("author", "name email");
     }
 
     async create(attr, user) {
@@ -34,13 +33,12 @@ class TasksRepository {
 
     async update(id, attr) {
         try {
-            console.log(id)
             const taskToUpdate = await taskModel.findById(id);
-            console.log(taskToUpdate)
             if (!taskToUpdate) {
                 throw new HttpError(404, "Task not found");
             }
 
+            console.log(attr)
             const updatedTask = await taskModel.findByIdAndUpdate(
                 id,
                 {
@@ -50,7 +48,8 @@ class TasksRepository {
                         due_date: attr.due_date,
                         state: attr.state,
                         project: attr.project,
-                        assigned_to: attr.assignedTo
+                        assigned_to: attr.assignedTo,
+                        logged_hours: attr.logged_hours,
                     },
                     $addToSet: {
                         users: {$each: attr.users || []}

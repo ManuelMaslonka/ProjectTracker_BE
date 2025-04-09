@@ -7,9 +7,11 @@ class ProjectsRepository {
     async addTag(id, tag, user) {
         try {
             const projectToUpdate = await this.findById(id);
+            console.log(projectToUpdate.author.toString())
+            console.log(user.userId)
             if (!projectToUpdate) {
                 throw new HttpError(404, 'Project not found');
-            } else if (projectToUpdate.author.toString() !== user.userId || user.roles.includes("admin")) {
+            } else if (projectToUpdate.author.toString() !== user.userId || !user.roles.includes("admin")) {
                 throw new HttpError(403, 'You are not allowed to update this project');
             }
 
@@ -31,14 +33,16 @@ class ProjectsRepository {
         }
     }
 
-    async removeTag(id, tag, userId) {
+    async removeTag(id, tag, user) {
         try {
             const projectToUpdate = await this.findById(id);
             if (!projectToUpdate) {
                 throw new HttpError(404, 'Project not found');
-            } else if (projectToUpdate.author.toString() !== userId) {
+            } else if (projectToUpdate.author.toString() !== user.userId || !user.roles.includes("admin")) {
                 throw new HttpError(403, 'You are not allowed to update this project');
             }
+
+            console.log(tag)
 
             const updatedProject = await projectModel.findByIdAndUpdate(
                 id,
@@ -66,6 +70,10 @@ class ProjectsRepository {
                 throw new HttpError(404, 'Project not found');
             } else if (projectToUpdate.author.toString() !== userId) {
                 throw new HttpError(403, 'You are not allowed to update this project');
+            }
+
+            if (project.status !== null) {
+                await this.setStatus(id, project.status);
             }
 
             const updatedProject = await projectModel.findByIdAndUpdate(
@@ -118,7 +126,7 @@ class ProjectsRepository {
                 status: "active",
                 tags: [...attr.tags],
                 author: attr.author,
-                users: [attr.author]
+                users: []
             });
             await project.save();
         } catch (e) {
@@ -166,6 +174,7 @@ class ProjectsRepository {
             })
             .populate("author", "name email _id")
             .populate("users", "name email _id");
+
     }
 
     async addTask(id, task, userId, project) {
@@ -220,12 +229,31 @@ class ProjectsRepository {
     async setStatus(id, status) {
         try {
 
-            console.log(status)
-            return await projectModel.findByIdAndUpdate(
-                id,
-                {status: status},
-                {new: true}
-            )
+            if (status == "active") {
+                return await projectModel.findByIdAndUpdate(
+                    id,
+                    {status: status},
+                    {new: true}
+                )
+            } else if (status == "completed") {
+
+                const project = await projectModel.findById(id).populate("tasks");
+                if (!project) {
+                    throw new HttpError(404, 'Project not found');
+                }
+
+                await taskModel.updateMany(
+                    {_id: {$in: project.tasks}},
+                    {state: "completed"}
+                );
+
+                return await projectModel.findByIdAndUpdate(
+                    id,
+                    {status: status},
+                    {new: true}
+                )
+
+            }
 
         } catch (e) {
             console.error(e)
@@ -240,6 +268,54 @@ class ProjectsRepository {
                 {$pull: {tasks: taskId}},
                 {new: true}
             );
+        } catch (e) {
+            console.error(e);
+            throw new HttpError(500, e.message);
+        }
+    }
+
+    async removeMember(id, userId) {
+        try {
+            return await projectModel.findByIdAndUpdate(
+                id,
+                {$pull: {users: userId}},
+                {new: true}
+            );
+        } catch (e) {
+            console.error(e);
+            throw new HttpError(500, e.message);
+        }
+    }
+
+    async getAllMembers(id) {
+        try {
+            const project = await projectModel.findById(id).populate("users", "name email _id");
+            if (!project) {
+                throw new HttpError(404, 'Project not found');
+            }
+            return project.users;
+        } catch (e) {
+            console.error(e);
+            throw new HttpError(500, e.message);
+        }
+    }
+
+    async getAvailableTags(id) {
+        try {
+            const project = await projectModel.findById(id);
+            if (!project) {
+                throw new HttpError(404, 'Project not found');
+            }
+
+            const allTags = await this.getAllTags();
+
+            const tagsOfProject = project.tags || [];
+
+            if (tagsOfProject.length === 0) {
+                return allTags;
+            }
+
+            return allTags.filter(tag => !tagsOfProject.includes(tag));
         } catch (e) {
             console.error(e);
             throw new HttpError(500, e.message);
