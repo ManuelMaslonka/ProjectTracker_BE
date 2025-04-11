@@ -29,19 +29,28 @@ if (!process.env.API_KEY) {
 }
 
 app.use(json())
-app.use(authMiddleware);
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Access-Token');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Max-Age', 3600);
+    res.setHeader('Access-Control-Expose-Headers', 'X-Access-Token');
+
+    // Handle preflight OPTIONS requests
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
 
     next();
 })
 
+app.use(authMiddleware);
+
 app.use("/users", require("./src/routes/users.routes"))
 app.use("/projects", require("./src/routes/projects.routes"))
-app.use("/public", require("./src/routes/public.routes"))
+app.use("/auth", require("./src/routes/auth.routes"))
 app.use("/tasks", require("./src/routes/tasks.routes"))
 app.use("/tags", require("./src/routes/tags.routes"))
 

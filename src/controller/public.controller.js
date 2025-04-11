@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const HttpError = require("../utils/HttpError");
 
 
-const signUp = [
+const register = [
     body("email").notEmpty().withMessage("Email is required").isEmail().withMessage("Invalid email"),
     body("name").notEmpty().withMessage("Username is required"),
     body("password").notEmpty().withMessage("Password is required").isLength({min: 6}).withMessage("Password must be at least 6 characters"),
@@ -43,7 +43,7 @@ const signUp = [
     }
 ];
 
-const signIn = [
+const login = [
     body("email").isEmail().withMessage("Email is required"),
     body("password").notEmpty().withMessage("Password is required"),
     async (req, res, next) => {
@@ -70,7 +70,8 @@ const signIn = [
             console.log(existingUser)
 
             res.send({
-                token
+                user: existingUser,
+                token: token
             });
 
         } catch (err) {
@@ -81,6 +82,6 @@ const signIn = [
 
 
 module.exports = {
-    signUp,
-    signIn
+    register,
+    login
 }

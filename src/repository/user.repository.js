@@ -62,6 +62,47 @@ class UserRepository {
         return filteredUsers;
     }
 
+    async updateProfile(userId, userData) {
+        try {
+            const user = await this.getById(userId);
+            if (!user) {
+                throw new HttpError(404, "User not found");
+            }
+
+            // Update name if provided
+            if (userData.name) {
+                user.name = userData.name;
+            }
+
+            // Update email if provided, but check for duplicates first
+            if (userData.email) {
+                console.log(userData.email, "user.email");
+
+                // Only check for duplicates if the email is actually changing
+                if (userData.email !== user.email) {
+                    const existingUser = await this.findUserByEmail(userData.email);
+                    if (existingUser) {
+                        throw new HttpError(400, "Email already in use");
+                    }
+                    user.email = userData.email;
+                }
+            }
+
+            // Update password if provided
+            if (userData.password) {
+                const salt = crypto.randomBytes(16).toString("hex");
+                user.salt = salt;
+                user.password = crypto.pbkdf2Sync(userData.password, salt, 1000, 64, 'sha512').toString('hex');
+            }
+
+            // Save the updated user
+            await user.save();
+            return user;
+        } catch (e) {
+            throw new HttpError(400, e.message);
+        }
+    }
+
     checkPassword = (user, password) => {
         const hash_pwd = crypto
             .pbkdf2Sync(password, user.salt, 1000, 64, 'sha512')

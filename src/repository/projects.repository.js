@@ -7,12 +7,13 @@ class ProjectsRepository {
     async addTag(id, tag, user) {
         try {
             const projectToUpdate = await this.findById(id);
-            console.log(projectToUpdate.author.toString())
-            console.log(user.userId)
             if (!projectToUpdate) {
                 throw new HttpError(404, 'Project not found');
-            } else if (projectToUpdate.author.toString() !== user.userId || !user.roles.includes("admin")) {
-                throw new HttpError(403, 'You are not allowed to update this project');
+            }
+            if (projectToUpdate.author.toString() !== user.userId.toString()) {
+                if (!user.roles.includes("admin")) {
+                    throw new HttpError(403, 'You are not allowed to update this project');
+                }
             }
 
             const updatedProject = await projectModel.findByIdAndUpdate(
@@ -38,8 +39,11 @@ class ProjectsRepository {
             const projectToUpdate = await this.findById(id);
             if (!projectToUpdate) {
                 throw new HttpError(404, 'Project not found');
-            } else if (projectToUpdate.author.toString() !== user.userId || !user.roles.includes("admin")) {
-                throw new HttpError(403, 'You are not allowed to update this project');
+            }
+            if (projectToUpdate.author.toString() !== user.userId.toString()) {
+                if (!user.roles.includes("admin")) {
+                    throw new HttpError(403, 'You are not allowed to update this project');
+                }
             }
 
             console.log(tag)

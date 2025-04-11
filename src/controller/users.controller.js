@@ -78,6 +78,44 @@ const addRole = [
     }
 ]
 
+const updateProfile = [
+    body("name").optional().notEmpty().withMessage("Name cannot be empty"),
+    body("email").optional().isEmail().withMessage("Valid email is required"),
+    body("password").optional().notEmpty().withMessage("Password cannot be empty"),
+    body("confirmPassword").optional().notEmpty().withMessage("Confirm password cannot be empty").custom((value, {req}) => {
+        if (value !== req.body.password) {
+            throw new Error("Password does not match");
+        }
+        return true;
+    }),
+    async (req, res, next) => {
+        try {
+            checkValidation(validationResult(req));
+            const data = matchedData(req);
+
+            // Only allow updating name, email, and password
+            const updateData = {};
+            if (data.name) updateData.name = data.name;
+            if (data.email) updateData.email = data.email;
+            if (data.password) updateData.password = data.password;
+
+            const updatedUser = await userRepository.updateProfile(req.user.userId, updateData);
+
+            // Don't send password and salt in response
+            const userResponse = {
+                _id: updatedUser._id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                roles: updatedUser.roles
+            };
+
+            res.send(userResponse);
+        } catch (e) {
+            next(e);
+        }
+    }
+]
+
 module.exports = {
     getAll,
     getById,
@@ -85,5 +123,6 @@ module.exports = {
     getAvailableUsersToAdd,
     getAvailableUsersToAssignTask,
     create,
-    addRole
+    addRole,
+    updateProfile
 }
