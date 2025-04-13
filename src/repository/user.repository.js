@@ -55,10 +55,9 @@ class UserRepository {
             .populate('author', 'name email _id');
 
         const userInTask = await taskModel.findById(taskId);
-        console.log(userInTask);
         const users = [...allUsersInProject.users, allUsersInProject.author];
-        const filteredUsers = users.filter(user => user._id.toString() !== userInTask.assigned_to.toString());
-        console.log(filteredUsers);
+
+        const filteredUsers = users.filter(user => user._id.toString() !== userInTask.assigned_to?.toString());
         return filteredUsers;
     }
 
