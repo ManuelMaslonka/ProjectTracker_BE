@@ -30,6 +30,9 @@ if (!process.env.API_KEY) {
 
 app.use(json())
 
+// Serve static files from the public directory
+app.use(express.static('public'));
+
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');

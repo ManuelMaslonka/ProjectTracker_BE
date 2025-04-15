@@ -12,6 +12,11 @@ const create = [
         try {
             checkValidation(validationResult(req));
 
+            // Handle file upload if present
+            if (req.file) {
+                req.body.image_path = `/images/${req.file.filename}`;
+            }
+
             const newTask = await tasksRepository.create(req.body, req.user);
             await projectRepository.addTasksToProject(req.body.project, newTask.id);
 
@@ -34,12 +39,42 @@ const findAll = async (req, res, next) => {
     res.send(allTasks);
 }
 
+const uploadImage = [
+    param('id').notEmpty().withMessage("Id is required"),
+    async (req, res, next) => {
+    try {
+        console.log("req.file", req.file);
+
+        const task = await tasksRepository.findById(req.params.id);
+        if (!task) {
+            throw new HttpError(404, "Task not found");
+        }
+
+        if (req.file) {
+            req.body.image_path = `/images/${req.file.filename}`;
+        }
+
+        await tasksRepository.update(req.params.id, req.body);
+
+        res.send({
+            message: "Image uploaded successfully"
+        });
+    } catch (e) {
+        next(e);
+    }
+}]
+
 const update = [
     param("id").notEmpty().withMessage("Id is required"),
     // ...validateTask,
     async (req, res, next) => {
         try {
-            // checkValidation(validationResult(req));
+            checkValidation(validationResult(req));
+
+            if (req.file) {
+                req.body.image_path = `/images/${req.file.filename}`;
+            }
+
             await tasksRepository.update(req.params.id, req.body);
             res.send({
                 message: "Task updated successfully"
@@ -174,5 +209,6 @@ module.exports = {
     assignTask,
     setState,
     logHours,
-    deleteTask
+    deleteTask,
+    uploadImage
 }

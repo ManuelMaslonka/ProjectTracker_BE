@@ -22,7 +22,8 @@ class TasksRepository {
                 state: "open",
                 project: attr.project,
                 assigned_to: attr.assignedTo,
-                author: user.userId
+                author: user.userId,
+                image_path: attr.image_path
             });
 
             return newTask.save();
@@ -50,6 +51,7 @@ class TasksRepository {
                         project: attr.project,
                         assigned_to: attr.assignedTo,
                         logged_hours: attr.logged_hours,
+                        image_path: attr.image_path,
                     },
                     $addToSet: {
                         users: {$each: attr.users || []}

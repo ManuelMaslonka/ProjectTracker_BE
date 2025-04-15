@@ -39,6 +39,7 @@ const TaskSchema = new Schema({
     author: {type: Schema.Types.ObjectId, ref: "User", required: true},
     assigned_to: {type: Schema.Types.ObjectId, ref: "User"},
     logged_hours: {type: Number, default: 0},
+    image_path: {type: String},
 });
 
 
